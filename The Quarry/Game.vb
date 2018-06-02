@@ -76,7 +76,22 @@
 
     End Sub
 
-
+    Sub Collision(ByRef obj As PictureBox, ByRef Player As PictureBox)
+        'Collisions with objects
+        With Player
+            If .Bounds.IntersectsWith(obj.Bounds) Then
+                If .Tag = "r" Then
+                    .Left = obj.Left - .Width
+                ElseIf .Tag = "l" Then
+                    .Left = obj.Right
+                ElseIf .Tag = "u" Then
+                    .Top = obj.Bottom
+                Else
+                    .Top = obj.Top - .Height
+                End If
+            End If
+        End With
+    End Sub
 
     Private Sub tmrMovement_Tick(sender As Object, e As EventArgs) Handles tmrMovement.Tick
         Dim mpos As Point = PointToClient(MousePosition)

@@ -1,0 +1,12 @@
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.exe.config
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.exe
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.pdb
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.xml
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbprojAssemblyReference.cache
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The_Quarry.Game.resources
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The_Quarry.Resources.resources
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbproj.GenerateResource.cache
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbproj.CoreCompileInputs.cache
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.exe
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.xml
+C:\Users\libra\Documents\Visual Studio 2017\Projects\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.pdb

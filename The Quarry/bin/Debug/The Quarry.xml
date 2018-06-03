@@ -22,6 +22,16 @@ The Quarry
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
+<member name="P:The_Quarry.My.Resources.Resources.background">
+<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member>
+<member name="P:The_Quarry.My.Resources.Resources.background_nocrystal">
+<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member>
 <member name="P:The_Quarry.My.Resources.Resources.Crystal">
 <summary>
   Looks up a localized resource of type System.Drawing.Bitmap.

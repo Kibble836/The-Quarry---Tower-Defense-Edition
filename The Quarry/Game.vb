@@ -405,7 +405,10 @@ Public Class Chars
 
     Public Structure Player
         Public Const Speed As Integer = 6
+<<<<<<< HEAD
         Public Const MaxHealth As Integer = 100
+=======
+>>>>>>> 788bfa8f56f12f79c594a482374c7d78b5bcaaa6
         Public xmove As Integer
         Public ymove As Integer
     End Structure

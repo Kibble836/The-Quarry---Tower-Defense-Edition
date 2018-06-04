@@ -1,18 +1,35 @@
 ﻿Public Class Game
     'Dominick Manicone and Brandon Robayo
 
-
     'Objects
     Private Player As New PictureBox
     Private Crystal As New PictureBox
+    Private Boss = New PictureBox
     Private Colliders(19) As PictureBox
 
+    Public Const xMapSize As Integer = 768
+    Public Const yMapSize As Integer = 768
 
+    Private Spawnlocations(3) As Point
+
+    Private bossNum As Integer = 0
+
+    Private PStats As Chars.Player
+    Private RedStats As Chars.RedStats
+    Private GreenStats As Chars.GreenStats
+    Private BlueStats As Chars.BlueStats
+    Private PurpleStats As Chars.PurpleStats
+    Private TransStats As Chars.TransStats
 
     Private Sub Game_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Randomize()
+
         'Constants
-        Const xMapSize As Integer = 768
-        Const yMapSize As Integer = 768
+        Spawnlocations(0) = New Point(xMapSize / 2 - 16, 0)
+        Spawnlocations(1) = New Point(0, yMapSize / 2 - 16)
+        Spawnlocations(2) = New Point(xMapSize, yMapSize / 2 - 16)
+        Spawnlocations(3) = New Point(xMapSize / 2 - 16, yMapSize)
+
         Const TileSize As Integer = 32
 
         'Initializing form
@@ -23,6 +40,8 @@
         'Create Objects
         'Player
         With Player
+            PStats.xmove = 0
+            PStats.ymove = 0
             .Size = New Size(TileSize, TileSize)
             .Name = "Player"
             .Visible = True
@@ -41,6 +60,13 @@
             .Visible = True
             Controls.Add(Crystal)
         End With
+
+        'Enemy
+
+        Controls.Add(Boss)
+
+        SpawnBoss()
+
 
         'Colliders
         For i As Integer = 0 To 19
@@ -114,11 +140,43 @@
                 End Select
                 Controls.Add(Colliders(i))
             End With
-
         Next
 
 
 
+
+    End Sub
+
+    Private Sub SpawnBoss()
+        With Boss
+
+            .Location = Spawnlocations(Rand(0, 3))
+            .Visible = True
+            bossNum += 1
+            Select Case bossNum
+                Case 1
+                    .BackColor = Color.Red
+                    .tag = RedStats.MaxHealth
+                    .Size = New Size(RedStats.Scale, RedStats.Scale)
+                Case 2
+                    .BackColor = Color.Green
+                    .tag = Greenstats.MaxHealth
+                    .size = New Size(Greenstats.Scale, Greenstats.Scale)
+
+                Case 3
+                    .backcolor = Color.Blue
+                    .tag = BlueStats.MaxHealth
+                    .size = New Size(BlueStats.Scale, BlueStats.Scale)
+                Case 4
+                    .backcolor = Color.Purple
+                    .tag = PurpleStats.MaxHealth
+                    .size = New Size(PurpleStats.Scale, PurpleStats.Scale)
+                Case 5
+                    .backcolor = Color.Transparent
+                    .tag = TransStats.MaxHealth
+                    .size = New Size(TransStats.Scale, TransStats.Scale)
+            End Select
+        End With
 
     End Sub
 
@@ -137,7 +195,7 @@
         End Select
     End Sub
 
-    Private Sub Movement(ByRef obj As PictureBox, ByVal Speed As Integer)
+    Public Sub Movement(ByRef obj As PictureBox, ByVal Speed As Integer)
         With obj
             Select Case .Tag
                 Case "r"
@@ -155,7 +213,32 @@
 
     End Sub
 
-    Sub Collision(ByRef obj As PictureBox, ByRef Player As PictureBox)
+    Public Function Rand(ByVal intLow As Integer, ByVal intHigh As Integer) As Integer
+        Return Int(Rnd() * (intHigh - intLow + 1) + intLow)
+    End Function
+
+    Public Function lengthdir_x(ByVal dist As Integer, ByVal dir As Integer) As Integer
+        Return Math.Cos(toRad(dir)) * dist
+    End Function
+
+    Public Function lengthdir_y(ByVal dist As Integer, ByVal dir As Integer) As Integer
+        Return Math.Sin(toRad(dir)) * dist
+    End Function
+
+    Public Function Clamp(ByVal dblVal As Double, ByVal dblMin As Double, ByVal dblMax As Double) 'Clamps a value between two numbers.
+        If dblVal > dblMax Then
+            dblVal = dblMax
+        ElseIf dblVal < dblMin Then
+            dblVal = dblMin
+        End If
+        Return dblVal
+    End Function
+
+    Private Function toRad(ByVal deg As Integer) As Double
+        Return deg * (Math.PI / 180)
+    End Function
+
+    Public Sub Collision(ByRef obj As PictureBox, ByRef Player As PictureBox)
         'Collisions with objects
         With Player
             If .Bounds.IntersectsWith(obj.Bounds) Then
@@ -176,17 +259,71 @@
         Dim mpos As Point = PointToClient(MousePosition)
         Dim dir As Integer = point_at(Player.Location, mpos)
         Movement(Player, Chars.Player.Speed)
+
+        If bossNum = 1 Then
+            RedStats.RedAI(Boss, Player)
+        ElseIf bossNum = 2 Then
+            GreenStats.GreenAI(Boss, Player)
+        ElseIf bossNum = 3 Then
+            BlueStats.BlueAI(Boss, Player)
+        ElseIf bossNum = 4 Then
+            PurpleStats.PurpleAI(Boss, Crystal)
+        ElseIf bossNum = 5 Then
+            TransStats.TransAI(Boss, Player)
+        End If
+
+        lblMouseDir.Text = Boss.tag.ToString
+
+        If Boss.Tag <= 0 Then
+            SpawnBoss()
+        End If
+
         For Each obj In Colliders
             Collision(obj, Player)
         Next
 
+
     End Sub
+
+    Private Function collision_point(ByVal Colliders As PictureBox(), ByVal point As Point, Optional ByVal type As String = "")
+        For Each obj In Colliders
+            If obj.Bounds.IntersectsWith(New Rectangle(point, New Size(1, 1))) = True Then
+                If type = "Collision" Then
+                    Return obj
+                Else
+                    Return obj.Bounds.IntersectsWith(New Rectangle(point, New Size(1, 1)))
+                End If
+                Exit For
+            End If
+        Next
+    End Function
+
+    Private Function raycast(ByVal point As Point, ByVal dir As Integer, ByRef col() As PictureBox, Optional ByVal Type As String = "")
+        Dim dist As Integer = 0
+        dist = 0
+        While collision_point(col, New Point(point.X + lengthdir_x(dist, dir), point.Y + lengthdir_y(dist, dir))) = False And dist < 1000
+            dist += 1
+        End While
+        If Type = "Collision" Then
+            If collision_point(col, New Point(point.X + lengthdir_x(dist, dir), point.Y + lengthdir_y(dist, dir))) <> Nothing Then
+                Return collision_point(col, New Point(point.X + lengthdir_x(dist, dir), point.Y + lengthdir_y(dist, dir)), "Collision")
+            Else
+                Return "Nothing"
+            End If
+        ElseIf Type = "Point" Then
+            dist -= 1
+            Return New Point(point.X + lengthdir_x(dist, dir), point.Y + lengthdir_y(dist, dir))
+        Else
+            dist -= 1
+            Return dist
+        End If
+    End Function
 
     Private Sub Game_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         Player.Tag = ""
     End Sub
 
-    Private Function point_at(ByVal pos1 As Point, ByVal pos2 As Point) As Integer 'takes in an x & y to point towards the cursor from said position.
+    Public Function point_at(ByVal pos1 As Point, ByVal pos2 As Point) As Integer 'takes in an x & y to point towards the cursor from said position.
         Dim dir As Integer, rad As Double
         'd stands for delta.         
         Dim dX As Integer = pos2.X - pos1.X
@@ -196,12 +333,128 @@
         Return dir
     End Function
 
+    Private Sub Game_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
+        Dim mpos As Point = PointToClient(MousePosition)
+        Dim dir As Integer = point_at(Player.Location, mpos)
+        Dim playerLocation As Point = New Point(Player.Location.X + 16, Player.Location.Y + 16)
+        If e.Button = MouseButtons.Left Then
+            If raycast(Player.Location, dir, (Boss), "Collision") Is Boss Then
+                Boss.Tag -= 50
+            End If
+
+        End If
+    End Sub
+
+
 End Class
 
 Public Class Chars
 
     Public Structure Player
+        Public Const Speed As Integer = 4
+        Public xmove As Integer
+        Public ymove As Integer
+    End Structure
+
+    'RED
+    Public Structure RedStats
+        Public Const Speed As Integer = 3
+        Public Const MaxHealth As Integer = 250
+        Public Const Scale As Integer = 128
+        'AI
+        Public Sub RedAI(ByRef Red As PictureBox, ByRef target As PictureBox)
+            If target.Location.X - Red.Location.X - RedStats.Scale / 2 + target.Size.Width / 2 < 0 Then
+                Red.Left -= RedStats.Speed
+            ElseIf target.Location.X - Red.Location.X - RedStats.Scale / 2 + target.Size.Width / 2 > 0 Then
+                Red.Left += RedStats.Speed
+            End If
+            If target.Location.Y - Red.Location.Y - RedStats.Scale / 2 + target.Size.Height / 2 < 0 Then
+                Red.Top -= RedStats.Speed
+            ElseIf target.Location.Y - Red.Location.Y - RedStats.Scale / 2 + target.Size.Height / 2 > 0 Then
+                Red.Top += RedStats.Speed
+            End If
+        End Sub
+    End Structure
+
+    'GREEN
+    Public Structure GreenStats
         Public Const Speed As Integer = 5
+        Public Const MaxHealth As Integer = 150
+        Public Const Scale As Integer = 96
+        'AI
+        Public Sub GreenAI(ByRef Green As PictureBox, ByRef target As PictureBox)
+            If target.Location.X - Green.Location.X - GreenStats.Scale / 2 + target.Size.Width / 2 < 0 Then
+                Green.Left -= GreenStats.Speed
+            ElseIf target.Location.X - Green.Location.X - GreenStats.Scale / 2 + target.Size.Width / 2 > 0 Then
+                Green.Left += GreenStats.Speed
+            End If
+            If target.Location.Y - Green.Location.Y - GreenStats.Scale / 2 + target.Size.Height / 2 < 0 Then
+                Green.Top -= GreenStats.Speed
+            ElseIf target.Location.Y - Green.Location.Y - GreenStats.Scale / 2 + target.Size.Height / 2 > 0 Then
+                Green.Top += GreenStats.Speed
+            End If
+        End Sub
+    End Structure
+
+    'BLUE
+    Public Structure BlueStats
+        Public Const Speed As Integer = 3
+        Public Const MaxHealth As Integer = 250
+        Public Const Scale As Integer = 128
+        'AI
+        Public Sub BlueAI(ByRef Blue As PictureBox, ByRef target As PictureBox)
+            If target.Location.X - Blue.Location.X - BlueStats.Scale / 2 + target.Size.Width / 2 < 0 Then
+                Blue.Left -= BlueStats.Speed
+            ElseIf target.Location.X - Blue.Location.X - BlueStats.Scale / 2 + target.Size.Width / 2 > 0 Then
+                Blue.Left += BlueStats.Speed
+            End If
+            If target.Location.Y - Blue.Location.Y - BlueStats.Scale / 2 + target.Size.Height / 2 < 0 Then
+                Blue.Top -= BlueStats.Speed
+            ElseIf target.Location.Y - Blue.Location.Y - BlueStats.Scale / 2 + target.Size.Height / 2 > 0 Then
+                Blue.Top += BlueStats.Speed
+            End If
+        End Sub
+    End Structure
+
+    'PURPLE
+    Public Structure PurpleStats
+        Public Const Speed As Integer = 2
+        Public Const MaxHealth As Integer = 350
+        Public Const Scale As Integer = 196
+        'AI
+        Public Sub PurpleAI(ByRef Purple As PictureBox, ByRef target As PictureBox)
+            If target.Location.X - Purple.Location.X - PurpleStats.Scale / 2 + target.Size.Width / 2 < 0 Then
+                Purple.Left -= PurpleStats.Speed
+            ElseIf target.Location.X - Purple.Location.X - PurpleStats.Scale / 2 + target.Size.Width / 2 > 0 Then
+                Purple.Left += PurpleStats.Speed
+            End If
+            If target.Location.Y - Purple.Location.Y - PurpleStats.Scale / 2 + target.Size.Height / 2 < 0 Then
+                Purple.Top -= PurpleStats.Speed
+            ElseIf target.Location.Y - Purple.Location.Y - PurpleStats.Scale / 2 + target.Size.Height / 2 > 0 Then
+                Purple.Top += PurpleStats.Speed
+            End If
+        End Sub
+    End Structure
+
+    'TRANSPARENT
+    Public Structure TransStats
+        Public Const Speed As Integer = 5
+        Public Const MaxHealth As Integer = 100
+        Public Const Scale As Integer = 64
+        'AI
+        Public Sub TransAI(ByRef Trans As PictureBox, ByRef target As PictureBox)
+            If target.Location.X - Trans.Location.X - TransStats.Scale / 2 + target.Size.Width / 2 < 0 Then
+                Trans.Left -= TransStats.Speed
+            ElseIf target.Location.X - Trans.Location.X - TransStats.Scale / 2 + target.Size.Width / 2 > 0 Then
+                Trans.Left += TransStats.Speed
+            End If
+            If target.Location.Y - Trans.Location.Y - TransStats.Scale / 2 + target.Size.Height / 2 < 0 Then
+                Trans.Top -= TransStats.Speed
+            ElseIf target.Location.Y - Trans.Location.Y - TransStats.Scale / 2 + target.Size.Height / 2 > 0 Then
+                Trans.Top += TransStats.Speed
+            End If
+        End Sub
     End Structure
 
 End Class
+

@@ -24,7 +24,6 @@ Partial Class Game
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.tmrMovement = New System.Windows.Forms.Timer(Me.components)
-        Me.lblMouseDir = New System.Windows.Forms.Label()
         Me.SuspendLayout()
         '
         'tmrMovement
@@ -32,28 +31,16 @@ Partial Class Game
         Me.tmrMovement.Enabled = True
         Me.tmrMovement.Interval = 1
         '
-        'lblMouseDir
-        '
-        Me.lblMouseDir.AutoSize = True
-        Me.lblMouseDir.Location = New System.Drawing.Point(12, 9)
-        Me.lblMouseDir.Name = "lblMouseDir"
-        Me.lblMouseDir.Size = New System.Drawing.Size(39, 13)
-        Me.lblMouseDir.TabIndex = 0
-        Me.lblMouseDir.Text = "Label1"
-        '
         'Game
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(984, 961)
-        Me.Controls.Add(Me.lblMouseDir)
         Me.Name = "Game"
         Me.Text = "The Quarry"
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents tmrMovement As Timer
-    Friend WithEvents lblMouseDir As Label
 End Class

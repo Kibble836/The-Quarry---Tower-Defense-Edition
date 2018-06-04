@@ -12,6 +12,12 @@
 
     Private Spawnlocations(3) As Point
 
+    Private PHealth As Integer = PStats.MaxHealth
+    Private CHealth As Integer = 1000
+
+    Private CStats
+    Private blnGameOver As Boolean = False
+
     Private bossNum As Integer = 0
 
     Private PStats As Chars.Player
@@ -147,6 +153,29 @@
 
     End Sub
 
+    Private Sub DrawHealthbar(ByVal Percent As Double, ByVal LLeft As Point, ByVal URight As Point, ByVal fcolor As Brush)
+        'initialize pens
+        Dim bpen As New Pen(Brushes.Gray)
+        Dim fpen As New Pen(fcolor)
+        Dim epen As New Pen(Color.Black)
+        'background dimensions
+        Dim bheight As Integer = URight.Y - LLeft.Y
+        Dim bwidth As Integer = URight.X - LLeft.X
+        Dim fheight As Integer = bheight / 3
+        'misc values
+        Dim startY As Integer = LLeft.Y - bheight / 2
+        Dim length As Integer = Math.Abs((URight.X - LLeft.X) * Percent)
+        'setting pen width
+        bpen.Width = bheight
+        epen.Width = fheight
+        fpen.Width = fheight
+        'drawing lines
+        Me.CreateGraphics.Flush()
+        Me.CreateGraphics.DrawLine(bpen, LLeft.X, startY, URight.X, startY) 'background
+        Me.CreateGraphics.DrawLine(epen, LLeft.X, startY, URight.X, startY) 'empty central bar
+        Me.CreateGraphics.DrawLine(fpen, LLeft.X, startY, LLeft.X + length, startY) 'value
+    End Sub
+
     Private Sub SpawnBoss()
         With Boss
 
@@ -158,23 +187,30 @@
                     .BackColor = Color.Red
                     .tag = RedStats.MaxHealth
                     .Size = New Size(RedStats.Scale, RedStats.Scale)
+                    CStats = RedStats
                 Case 2
                     .BackColor = Color.Green
                     .tag = Greenstats.MaxHealth
-                    .size = New Size(Greenstats.Scale, Greenstats.Scale)
-
+                    .size = New Size(GreenStats.Scale, GreenStats.Scale)
+                    CStats = GreenStats
                 Case 3
                     .backcolor = Color.Blue
                     .tag = BlueStats.MaxHealth
                     .size = New Size(BlueStats.Scale, BlueStats.Scale)
+                    CStats = BlueStats
                 Case 4
                     .backcolor = Color.Purple
                     .tag = PurpleStats.MaxHealth
                     .size = New Size(PurpleStats.Scale, PurpleStats.Scale)
+                    CStats = PurpleStats
                 Case 5
                     .backcolor = Color.Transparent
                     .tag = TransStats.MaxHealth
                     .size = New Size(TransStats.Scale, TransStats.Scale)
+                    CStats = TransStats
+                Case Else
+                    Boss.Dispose()
+                    Controls.Remove(Boss)
             End Select
         End With
 
@@ -216,15 +252,12 @@
     Public Function Rand(ByVal intLow As Integer, ByVal intHigh As Integer) As Integer
         Return Int(Rnd() * (intHigh - intLow + 1) + intLow)
     End Function
-
     Public Function lengthdir_x(ByVal dist As Integer, ByVal dir As Integer) As Integer
         Return Math.Cos(toRad(dir)) * dist
     End Function
-
     Public Function lengthdir_y(ByVal dist As Integer, ByVal dir As Integer) As Integer
         Return Math.Sin(toRad(dir)) * dist
     End Function
-
     Public Function Clamp(ByVal dblVal As Double, ByVal dblMin As Double, ByVal dblMax As Double) 'Clamps a value between two numbers.
         If dblVal > dblMax Then
             dblVal = dblMax
@@ -233,7 +266,6 @@
         End If
         Return dblVal
     End Function
-
     Private Function toRad(ByVal deg As Integer) As Double
         Return deg * (Math.PI / 180)
     End Function
@@ -259,7 +291,7 @@
         Dim mpos As Point = PointToClient(MousePosition)
         Dim dir As Integer = point_at(Player.Location, mpos)
         Movement(Player, Chars.Player.Speed)
-
+        Call DrawHealthbar(CHealth / 1000, New Point(10, 16), New Point(xMapSize - 10, 10), Brushes.YellowGreen)
         If bossNum = 1 Then
             RedStats.RedAI(Boss, Player)
         ElseIf bossNum = 2 Then
@@ -270,9 +302,10 @@
             PurpleStats.PurpleAI(Boss, Crystal)
         ElseIf bossNum = 5 Then
             TransStats.TransAI(Boss, Player)
+        Else
+            Boss.Dispose()
+            Controls.Remove(Boss)
         End If
-
-        lblMouseDir.Text = Boss.tag.ToString
 
         If Boss.Tag <= 0 Then
             SpawnBoss()
@@ -282,7 +315,17 @@
             Collision(obj, Player)
         Next
 
-
+        If Crystal.Bounds.IntersectsWith(Boss.Bounds) Then
+            CHealth -= CStats.Damage
+        End If
+        CHealth = Clamp(CHealth, 0, 1000)
+        If CHealth <= 0 And blnGameOver = False Then
+            Crystal.Visible = False
+            Boss.Dispose()
+            Controls.Remove(Boss)
+            blnGameOver = True
+            Me.BackgroundImage = My.Resources.background_nocrystal
+        End If
     End Sub
 
     Private Function collision_point(ByVal Colliders As PictureBox(), ByVal point As Point, Optional ByVal type As String = "")
@@ -337,24 +380,32 @@
         Dim mpos As Point = PointToClient(MousePosition)
         Dim dir As Integer = point_at(Player.Location, mpos)
         Dim playerLocation As Point = New Point(Player.Location.X + 16, Player.Location.Y + 16)
-        If e.Button = MouseButtons.Left Then
-            Dim bossArray(0) As PictureBox
-            bossArray(0) = Boss
-            'visual basic amirite
-            If raycast(Player.Location, dir, bossArray, "Collision") Is Boss Then
-                Boss.Tag -= 50
-            End If
+        Dim bossArray(20) As PictureBox
+        If CHealth > 0 And bossNum < 6 Then
+            For i = 0 To 19
+                bossArray(i) = Colliders(i)
+            Next
+            bossArray(20) = Boss
 
+            Dim pen As New Pen(Brushes.White)
+            pen.Width = 3.0F
+            Dim hitLocation As Point = raycast(Player.Location, dir, bossArray, "Point")
+            If e.Button = MouseButtons.Left Then
+                'visual basic amirite
+                If raycast(Player.Location, dir, bossArray, "Collision") Is Boss Then
+                    Boss.Tag -= 50
+                End If
+            End If
         End If
     End Sub
-
 
 End Class
 
 Public Class Chars
 
     Public Structure Player
-        Public Const Speed As Integer = 4
+        Public Const Speed As Integer = 6
+        Public Const MaxHealth As Integer = 100
         Public xmove As Integer
         Public ymove As Integer
     End Structure
@@ -363,19 +414,22 @@ Public Class Chars
     Public Structure RedStats
         Public Const Speed As Integer = 3
         Public Const MaxHealth As Integer = 250
-        Public Const Scale As Integer = 128
+        Public Const Scale As Integer = 96
+        Public Const Damage As Integer = 10
         'AI
         Public Sub RedAI(ByRef Red As PictureBox, ByRef target As PictureBox)
+            Dim xmove As Integer, ymove As Integer
             If target.Location.X - Red.Location.X - RedStats.Scale / 2 + target.Size.Width / 2 < 0 Then
-                Red.Left -= RedStats.Speed
+                xmove = -RedStats.Speed
             ElseIf target.Location.X - Red.Location.X - RedStats.Scale / 2 + target.Size.Width / 2 > 0 Then
-                Red.Left += RedStats.Speed
+                xmove = RedStats.Speed
             End If
             If target.Location.Y - Red.Location.Y - RedStats.Scale / 2 + target.Size.Height / 2 < 0 Then
-                Red.Top -= RedStats.Speed
+                ymove = -RedStats.Speed
             ElseIf target.Location.Y - Red.Location.Y - RedStats.Scale / 2 + target.Size.Height / 2 > 0 Then
-                Red.Top += RedStats.Speed
+                ymove = RedStats.Speed
             End If
+            Red.Location = New Point(Red.Location.X + xmove, Red.Location.Y + ymove)
         End Sub
     End Structure
 
@@ -383,7 +437,8 @@ Public Class Chars
     Public Structure GreenStats
         Public Const Speed As Integer = 5
         Public Const MaxHealth As Integer = 150
-        Public Const Scale As Integer = 96
+        Public Const Scale As Integer = 64
+        Public Const Damage As Integer = 7
         'AI
         Public Sub GreenAI(ByRef Green As PictureBox, ByRef target As PictureBox)
             If target.Location.X - Green.Location.X - GreenStats.Scale / 2 + target.Size.Width / 2 < 0 Then
@@ -403,7 +458,8 @@ Public Class Chars
     Public Structure BlueStats
         Public Const Speed As Integer = 3
         Public Const MaxHealth As Integer = 250
-        Public Const Scale As Integer = 128
+        Public Const Scale As Integer = 96
+        Public Const Damage As Integer = 20
         'AI
         Public Sub BlueAI(ByRef Blue As PictureBox, ByRef target As PictureBox)
             If target.Location.X - Blue.Location.X - BlueStats.Scale / 2 + target.Size.Width / 2 < 0 Then
@@ -423,7 +479,8 @@ Public Class Chars
     Public Structure PurpleStats
         Public Const Speed As Integer = 2
         Public Const MaxHealth As Integer = 350
-        Public Const Scale As Integer = 196
+        Public Const Scale As Integer = 128
+        Public Const Damage As Integer = 35
         'AI
         Public Sub PurpleAI(ByRef Purple As PictureBox, ByRef target As PictureBox)
             If target.Location.X - Purple.Location.X - PurpleStats.Scale / 2 + target.Size.Width / 2 < 0 Then
@@ -443,7 +500,8 @@ Public Class Chars
     Public Structure TransStats
         Public Const Speed As Integer = 5
         Public Const MaxHealth As Integer = 100
-        Public Const Scale As Integer = 64
+        Public Const Scale As Integer = 48
+        Public Const Damage As Integer = 5
         'AI
         Public Sub TransAI(ByRef Trans As PictureBox, ByRef target As PictureBox)
             If target.Location.X - Trans.Location.X - TransStats.Scale / 2 + target.Size.Width / 2 < 0 Then

@@ -338,7 +338,10 @@
         Dim dir As Integer = point_at(Player.Location, mpos)
         Dim playerLocation As Point = New Point(Player.Location.X + 16, Player.Location.Y + 16)
         If e.Button = MouseButtons.Left Then
-            If raycast(Player.Location, dir, (Boss), "Collision") Is Boss Then
+            Dim bossArray(0) As PictureBox
+            bossArray(0) = Boss
+            'visual basic amirite
+            If raycast(Player.Location, dir, bossArray, "Collision") Is Boss Then
                 Boss.Tag -= 50
             End If
 

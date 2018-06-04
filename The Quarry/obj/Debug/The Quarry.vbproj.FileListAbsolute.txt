@@ -22,3 +22,15 @@ C:\Users\rmani\Documents\GitHub\The-Quarry---Tower-Defense-Edition\The Quarry\ob
 C:\Users\rmani\Documents\GitHub\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.exe
 C:\Users\rmani\Documents\GitHub\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.xml
 C:\Users\rmani\Documents\GitHub\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.pdb
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.exe.config
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.exe
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.pdb
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\bin\Debug\The Quarry.xml
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbprojResolveAssemblyReference.cache
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The_Quarry.Game.resources
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The_Quarry.Resources.resources
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbproj.GenerateResource.Cache
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.vbproj.CoreCompileInputs.cache
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.exe
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.xml
+C:\Users\Dominick\Desktop\The Quarry\The-Quarry---Tower-Defense-Edition\The Quarry\obj\Debug\The Quarry.pdb

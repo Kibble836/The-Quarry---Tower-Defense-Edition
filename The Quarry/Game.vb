@@ -354,7 +354,7 @@ End Class
 Public Class Chars
 
     Public Structure Player
-        Public Const Speed As Integer = 4
+        Public Const Speed As Integer = 6
         Public xmove As Integer
         Public ymove As Integer
     End Structure
